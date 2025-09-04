@@ -14,8 +14,10 @@ export default function Header({ onClearChat, messageCount, selectedProject, onP
     <header className="bg-white border-b border-gray-200 px-4 py-4 shadow-sm">
       <div className="max-w-4xl mx-auto flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-md">
-            <span className="text-white text-lg font-bold">₿</span>
+          <div className={`w-10 h-10 bg-gradient-to-br ${PROJECTS.find(p => p.id === selectedProject)?.icon.backgroundColor} rounded-xl flex items-center justify-center shadow-md`}>
+            <span className={`${PROJECTS.find(p => p.id === selectedProject)?.icon.symbolColor} text-lg font-bold`}>
+              {PROJECTS.find(p => p.id === selectedProject)?.icon.symbol}
+            </span>
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Core LLM</h1>

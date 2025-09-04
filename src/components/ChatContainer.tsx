@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Message, PROJECTS } from '../types/chat';
+import { Message, PROJECTS, ProjectType } from '../types/chat';
 import ChatMessage from './ChatMessage';
 import LoadingIndicator from './LoadingIndicator';
 
@@ -10,7 +10,7 @@ interface ChatContainerProps {
   onRegenerate: () => void;
   canStop: boolean;
   canRegenerate: boolean;
-  selectedProject: string;
+  selectedProject: ProjectType;
 }
 
 export default function ChatContainer({ 
@@ -59,8 +59,10 @@ export default function ChatContainer({
     <div className="flex-1 overflow-y-auto px-4 py-6 space-y-1 relative">
       {messages.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
-          <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg">
-            <span className="text-3xl text-white font-bold">₿</span>
+          <div className={`w-16 h-16 bg-gradient-to-br ${PROJECTS.find(p => p.id === selectedProject)?.icon.backgroundColor} rounded-2xl flex items-center justify-center shadow-lg`}>
+            <span className={`text-3xl ${PROJECTS.find(p => p.id === selectedProject)?.icon.symbolColor} font-bold`}>
+              {PROJECTS.find(p => p.id === selectedProject)?.icon.symbol}
+            </span>
           </div>
           <div className="space-y-2">
             <h3 className="text-xl font-semibold text-gray-800">Welcome to Core LLM</h3>
