@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Message } from '../types/chat';
+import { Message, PROJECTS } from '../types/chat';
 import ChatMessage from './ChatMessage';
 import LoadingIndicator from './LoadingIndicator';
 
@@ -10,6 +10,7 @@ interface ChatContainerProps {
   onRegenerate: () => void;
   canStop: boolean;
   canRegenerate: boolean;
+  selectedProject: string;
 }
 
 export default function ChatContainer({ 
@@ -18,7 +19,8 @@ export default function ChatContainer({
   onStopGeneration, 
   onRegenerate, 
   canStop, 
-  canRegenerate 
+  canRegenerate,
+  selectedProject
 }: ChatContainerProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const lastUserMessageRef = useRef<string | null>(null);
@@ -63,7 +65,7 @@ export default function ChatContainer({
           <div className="space-y-2">
             <h3 className="text-xl font-semibold text-gray-800">Welcome to Core LLM</h3>
             <p className="text-gray-600 max-w-lg">
-              Ask questions about C++ Bitcoin Core code with references from the GitHub repository. I can help you understand implementations, analyze code patterns, and explore the codebase.
+              {PROJECTS.find(p => p.id === selectedProject)?.message || 'Ask me anything about the project.'}
             </p>
           </div>
         </div>

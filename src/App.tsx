@@ -35,6 +35,7 @@ function App() {
           onRegenerate={regenerateLastResponse}
           canStop={canStop}
           canRegenerate={canRegenerate}
+          selectedProject={selectedProject}
         />
         <div className="px-4">
           <ChatInput 

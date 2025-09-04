@@ -2,23 +2,27 @@ export interface Project {
   id: 'Bitcoin Core' | 'Core Lightning' | 'Bark';
   name: string;
   description: string;
+  message: string;
 }
 
 export const PROJECTS: Project[] = [
   {
     id: 'Bitcoin Core',
     name: 'Bitcoin Core',
-    description: 'Bitcoin Protocol Development'
+    description: 'Bitcoin Protocol Development',
+    message: 'Ask questions about C++ Bitcoin Core code with references from the GitHub repository. I can help you understand implementations, analyze code patterns, and explore the codebase.'
   },
   {
     id: 'Core Lightning',
     name: 'Core Lightning',
-    description: 'Lightning Network Implementation'
+    description: 'Lightning Network Implementation',
+    message: 'Ask questions about Core Lightning implementation. I can help you understand the Lightning Network protocol, analyze the codebase, and explore its features.'
   },
   {
     id: 'Bark',
     name: 'Bark',
-    description: 'Ark Implementation from Second'
+    description: 'Ark Implementation from Second',
+    message: 'Explore the Bark Ark implementation From Second. I can help you understand the Ark protocol,analyze the codebase, and explore its features.'
   }
 ];
 
