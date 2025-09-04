@@ -1,134 +1,69 @@
-
-import { RotateCcw, Link } from 'lucide-react';
-import { Message, LLMResponse } from '../types/chat';
+import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vs } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { Message } from '../types/chat';
 
 interface ChatMessageProps {
   message: Message;
-  showControls?: boolean;
-  onRegenerate?: () => void;
-  canRegenerate?: boolean;
 }
 
-function isLLMResponse(content: string | LLMResponse): content is LLMResponse {
-  return typeof content === 'object' && 'answer' in content;
-}
-
-export default function ChatMessage({ 
-  message, 
-  showControls = false,
-  onRegenerate,
-  canRegenerate
-}: ChatMessageProps) {
+const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
   const isUser = message.role === 'user';
-  
+
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4 animate-fade-in`}>
-      <div
-        className={`${
-          isUser 
-            ? 'max-w-xs sm:max-w-md lg:max-w-lg xl:max-w-xl' 
-            : 'max-w-full w-full'
-        } px-4 py-3 rounded-2xl ${
-          isUser
-            ? 'bg-orange-500 text-white rounded-br-md'
-            : 'bg-white text-gray-800 rounded-bl-md shadow-sm border border-gray-100'
-        }`}
-      >
-        {isUser ? (
-          <div className="text-sm leading-relaxed whitespace-pre-wrap font-mono">
-            {message.content as string}
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {isLLMResponse(message.content) ? (
-              <>
-                <div className="prose prose-sm max-w-none prose-pre:bg-gray-50">
-                  <ReactMarkdown 
-                    remarkPlugins={[remarkGfm]}
+      <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}>
+        <div
+            className={`max-w-3xl px-4 py-3 rounded-lg ${
+                isUser
+                    ? 'bg-orange-500 text-white'
+                    : 'bg-white text-gray-800 shadow-sm border'
+            }`}
+        >
+          {isUser ? (
+              <p className="whitespace-pre-wrap">{message.content as string}</p>
+          ) : (
+              <div className="prose prose-sm max-w-none">
+                <ReactMarkdown
                     components={{
-                      code({node, inline, className, children, ...props}: any) {
+                      code({ node, inline, className, children, ...props }) {
                         const match = /language-(\w+)/.exec(className || '');
-                        const language = match ? match[1] : '';
-                        
-                        if (inline) {
-                          return (
-                            <code className="bg-gray-100 rounded px-1 font-mono text-sm" {...props}>
+                        return !inline && match ? (
+                            <SyntaxHighlighter
+                                style={oneLight}
+                                language={match[1]}
+                                PreTag="div"
+                                className="rounded-md"
+                                {...props}
+                            >
+                              {String(children).replace(/\n$/, '')}
+                            </SyntaxHighlighter>
+                        ) : (
+                            <code className="bg-gray-100 px-1 py-0.5 rounded text-sm" {...props}>
                               {children}
                             </code>
-                          );
-                        }
-                        
-                        return (
-                          <SyntaxHighlighter
-                            style={vs}
-                            language={language}
-                            PreTag="div"
-                            customStyle={{
-                              margin: 0,
-                              borderRadius: '0.5rem',
-                              background: '#f8f9fa',
-                              border: '1px solid #e9ecef',
-                            }}
-                          >
-                            {String(children).replace(/\n$/, '')}
-                          </SyntaxHighlighter>
                         );
                       },
-                      pre({children}) {
-                        return <>{children}</>;
-                      }
+                      p: ({ children }) => <p className="mb-3 leading-relaxed">{children}</p>,
+                      strong: ({ children }) => <strong className="font-semibold text-orange-600">{children}</strong>,
+                      h1: ({ children }) => <h1 className="text-xl font-bold mb-3 text-gray-800">{children}</h1>,
+                      h2: ({ children }) => <h2 className="text-lg font-semibold mb-2 text-gray-800">{children}</h2>,
+                      h3: ({ children }) => <h3 className="text-md font-semibold mb-2 text-gray-700">{children}</h3>,
+                      ul: ({ children }) => <ul className="mb-3 pl-4">{children}</ul>,
+                      ol: ({ children }) => <ol className="mb-3 pl-4">{children}</ol>,
+                      li: ({ children }) => <li className="mb-1">{children}</li>,
                     }}
-                  >
-                    {message.content.answer}
-                  </ReactMarkdown>
-                </div>
-                {message.content.sources_used.length > 0 && (
-                  <div className="border-t border-gray-100 pt-2 mt-2">
-                    <div className="flex items-center space-x-1 text-xs text-gray-500">
-                      <Link size={12} />
-                      <span>Sources:</span>
-                    </div>
-                    <div className="mt-1 flex flex-wrap gap-1">
-                      {message.content.sources_used.map((source, index) => (
-                        <span 
-                          key={index}
-                          className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800"
-                        >
-                          {source}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="text-sm leading-relaxed whitespace-pre-wrap font-mono">
-                {message.content}
+                >
+                  {message.content as string}
+                </ReactMarkdown>
               </div>
-            )}
-          </div>
-        )}
-        <div className="flex flex-col space-y-2 mt-2">
-          <p className={`text-xs ${isUser ? 'text-orange-100' : 'text-gray-400'}`}>
-            {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-          </p>
-          {showControls && canRegenerate && (
-            <div className="flex space-x-2">
-              <button
-                onClick={onRegenerate}
-                className="flex items-center space-x-1 px-2 py-1 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-all duration-200"
-              >
-                <RotateCcw size={14} />
-                <span className="text-xs font-medium">Regenerate</span>
-              </button>
-            </div>
           )}
+          <div className={`text-xs mt-2 ${isUser ? 'text-orange-100' : 'text-gray-500'}`}>
+            {message.timestamp.toLocaleTimeString()}
+          </div>
         </div>
       </div>
-    </div>
   );
-}
+};
+
+export default ChatMessage;

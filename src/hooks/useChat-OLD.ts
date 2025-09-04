@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { Message } from '../types/chat';
+import testAnswerData from '../test/testAnswer-3.json';
 
 export default function useChat() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -21,33 +22,24 @@ export default function useChat() {
     setAbortController(controller);
 
     try {
-      // Call your Bitcoin Core LLM backend
-      const response = await fetch('http://localhost:5000/query', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          question: content
-        }),
-        signal: controller.signal
+      // Simulate API call to LLM backend
+      // In a real implementation, replace this with your actual API call
+      await new Promise((resolve, reject) => {
+        const timeout = setTimeout(resolve, 2000);
+        controller.signal.addEventListener('abort', () => {
+          clearTimeout(timeout);
+          reject(new Error('Request aborted'));
+        });
       });
-
+      
       if (controller.signal.aborted) return;
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      if (!data.success) {
-        throw new Error(data.error || 'Unknown error occurred');
-      }
+      // Using test answer from JSON file
+      const testAnswer = testAnswerData;
 
       const assistantMessage: Message = {
         id: `assistant-${Date.now()}`,
-        content: data.answer, // This is the verbose response from Claude
+        content: testAnswer,
         role: 'assistant',
         timestamp: new Date(),
       };
@@ -60,7 +52,7 @@ export default function useChat() {
         console.error('Error sending message:', error);
         const errorMessage: Message = {
           id: `error-${Date.now()}`,
-          content: 'Sorry, there was an error processing your request. Please try again. Make sure the Bitcoin Core backend is running on http://localhost:5000',
+          content: 'Sorry, there was an error processing your request. Please try again.',
           role: 'assistant',
           timestamp: new Date(),
         };
@@ -88,7 +80,6 @@ export default function useChat() {
       }
     }
   }, [messages, sendMessage]);
-
   const clearChat = useCallback(() => {
     setMessages([]);
   }, []);
